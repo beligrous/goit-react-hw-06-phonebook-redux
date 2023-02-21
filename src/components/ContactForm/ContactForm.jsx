@@ -1,10 +1,25 @@
-import React, { useState } from 'react';
+// import React, { useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Form, Button, Input } from './contact-form.styled';
+import { addName, addNumber } from 'redux/actions';
 
 function ContactForm({ onSubmit }) {
-  const [name, setName] = useState('');
-  const [number, setNumber] = useState('');
+  // const [name, setName] = useState('');
+  // const [number, setNumber] = useState('');
+  const name = useSelector(store => store.name);
+  const number = useSelector(store => store.number);
+  const dispatch = useDispatch();
+
+  const addingName = e => {
+    const action = addName(e.target.value);
+    dispatch(action);
+  };
+
+  const addingNumber = e => {
+    const action = addNumber(e.target.value);
+    dispatch(action);
+  };
 
   const handleSubmitContact = e => {
     e.preventDefault();
@@ -13,8 +28,10 @@ function ContactForm({ onSubmit }) {
   };
 
   const reset = () => {
-    setName('');
-    setNumber('');
+    const actionName = addName('');
+    dispatch(actionName);
+    const actionNumber = addNumber('');
+    dispatch(actionNumber);
   };
 
   return (
@@ -23,7 +40,7 @@ function ContactForm({ onSubmit }) {
         Name
         <Input
           type="text"
-          onChange={({ target }) => setName(target.value)}
+          onChange={addingName}
           value={name}
           name="name"
           pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
@@ -34,7 +51,7 @@ function ContactForm({ onSubmit }) {
       <label>
         Number
         <Input
-          onChange={({ target }) => setNumber(target.value)}
+          onChange={addingNumber}
           value={number}
           name="number"
           pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"

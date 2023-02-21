@@ -1,20 +1,41 @@
-import React, { useState, useEffect } from 'react';
+// import React, { useState, useEffect } from 'react';
 import { nanoid } from 'nanoid';
 import { Container } from './App.styled';
+import { useSelector, useDispatch } from 'react-redux';
 import ContactForm from './ContactForm/ContactForm';
 import Filter from './Filter/Filter';
 import ContactList from './ContactList/ContactList';
+import { addContact, delContact, addFilter } from 'redux/actions';
 
 export function App() {
-  const [contacts, setContacts] = useState(() => {
-    const data = JSON.parse(localStorage.getItem('contacts'));
-    return data?.length > 0 ? data : [];
-  });
-  const [filter, setFilter] = useState('');
+  // const [contacts, setContacts] = useState(() => {
+  //   const data = JSON.parse(localStorage.getItem('contacts'));
+  //   return data?.length > 0 ? data : [];
+  // });
+  // const [filter, setFilter] = useState('');
 
-  useEffect(() => {
-    localStorage.setItem('contacts', JSON.stringify(contacts));
-  }, [contacts]);
+  const contacts = useSelector(store => store.contacts);
+  const filter = useSelector(store => store.filter);
+  const dispatch = useDispatch();
+
+  // useEffect(() => {
+  //   localStorage.setItem('contacts', JSON.stringify(contacts));
+  // }, [contacts]);
+
+  const addingContact = payload => {
+    const action = addContact(payload);
+    dispatch(action);
+  };
+
+  const deletingContact = payload => {
+    const action = delContact(payload);
+    dispatch(action);
+  };
+
+  const addingFilter = e => {
+    const action = addFilter(e.target.value);
+    dispatch(action);
+  };
 
   const formSubmit = data => {
     const { name, number } = data;
@@ -30,7 +51,7 @@ export function App() {
     }, []);
 
     if (nonEqualArray.length === contacts.length) {
-      setContacts(contacts => [...contacts, newContact]);
+      addingContact(newContact);
     } else {
       alert(`${newContact.name} is already in contacts!`);
     }
@@ -49,7 +70,7 @@ export function App() {
   };
 
   const onClickDelete = id => {
-    setContacts(prevContacts => prevContacts.filter(item => item.id !== id));
+    deletingContact(id);
   };
 
   return (
@@ -58,10 +79,7 @@ export function App() {
       <ContactForm onSubmit={formSubmit} />
       <div>
         <h2>Contacts</h2>
-        <Filter
-          value={filter}
-          onChange={({ target }) => setFilter(target.value)}
-        />
+        <Filter value={filter} onChange={addingFilter} />
         <ContactList
           filter={filter}
           contacts={contacts}
@@ -72,4 +90,3 @@ export function App() {
     </Container>
   );
 }
-
